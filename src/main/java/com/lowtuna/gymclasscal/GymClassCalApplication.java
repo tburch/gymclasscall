@@ -21,12 +21,14 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
             args[args.length - 1] = System.getProperty("user.home") + args[args.length - 1].substring(1);
         }
 
-        File configFile = new File(args[args.length - 1]);
-        String config = FileUtils.readFileToString(configFile);
-        String port = System.getenv("PORT");
-        log.info("Replacing all occurrences of {} with {} in {}", PORT_KEY, port, args[args.length - 1]);
-        config = config.replace(PORT_KEY, port);
-        FileUtils.write(configFile, config);
+        if ("server".equalsIgnoreCase(args[0]) && "herokuFix".equalsIgnoreCase(args[1])) {
+            File configFile = new File(args[args.length - 1]);
+            String config = FileUtils.readFileToString(configFile);
+            String port = System.getenv("PORT");
+            log.info("Replacing all occurrences of {} with {} in {}", PORT_KEY, port, args[args.length - 1]);
+            config = config.replace(PORT_KEY, port);
+            FileUtils.write(configFile, config);
+        }
 
         new GymClassCalApplication().run(args);
     }
