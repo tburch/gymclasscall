@@ -28,7 +28,12 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
             log.info("Replacing all occurrences of {} with {} in {}", PORT_KEY, port, args[args.length - 1]);
             config = config.replace(PORT_KEY, port);
             FileUtils.write(configFile, config);
-            args[1] = args[2];// remote herokuFix flag
+
+            //fix args to what DropWizard is expecting
+            String[] correctArgs = new String[2];
+            correctArgs[0] = args[0];
+            correctArgs[1] = args[args.length - 1];
+            args = correctArgs;
         }
 
         new GymClassCalApplication().run(args);
