@@ -7,7 +7,7 @@ server:
     port: PORTPORT
   adminConnectors:
   - type: "http"
-    port: PORTPORT
+    port: 8081
 
 # Logging settings.
 logging:

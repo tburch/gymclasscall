@@ -24,7 +24,7 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
         File configFile = new File(args[args.length - 1]);
         String config = FileUtils.readFileToString(configFile);
         String port = System.getenv("PORT");
-        log.debug("Replacing all occurrences of {} with {} in {}", PORT_KEY, port, args[args.length - 1]);
+        log.info("Replacing all occurrences of {} with {} in {}", PORT_KEY, port, args[args.length - 1]);
         config = config.replace(PORT_KEY, port);
         FileUtils.write(configFile, config);
 
