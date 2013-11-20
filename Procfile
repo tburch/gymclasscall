@@ -1,1 +1,1 @@
-web    java $JAVA_OPTS -Ddw.server.http.port=$PORT -Ddw.server.http.adminPort=$PORT -jar target/GymClassCal.jar server target/classes/gymClassCal.yml
+web    java $JAVA_OPTS -jar target/GymClassCal.jar server target/config/gymClassCal.yml

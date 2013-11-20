@@ -1,7 +1,14 @@
 server:
   requestLog:
-    appenders:
-    - type: "console"
+      appenders:
+      - type: "console"
+  applicationConnectors:
+  - type: "http"
+    port: ${env.PORT}
+  adminConnectors:
+  - type: "http"
+    port: ${env.PORT}
+
 # Logging settings.
 logging:
   level: INFO
