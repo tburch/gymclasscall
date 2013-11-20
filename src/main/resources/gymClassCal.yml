@@ -4,7 +4,7 @@ server:
       - type: "console"
   applicationConnectors:
   - type: "http"
-    port: ${env.PORT}
+    port: PORTPORT
   adminConnectors:
   - type: "http"
     port: 8081
