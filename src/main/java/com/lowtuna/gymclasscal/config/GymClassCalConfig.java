@@ -4,6 +4,7 @@ import com.damnhandy.uri.template.MalformedUriTemplateException;
 import com.damnhandy.uri.template.UriTemplate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
+import io.dropwizard.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Setter
 @Slf4j
 public class GymClassCalConfig extends Configuration {
+    @JsonProperty
+    private Duration clubIdsUpdateDuration = null;
+
     @JsonProperty
     private int numberOfWeekToLoad = 4;
 

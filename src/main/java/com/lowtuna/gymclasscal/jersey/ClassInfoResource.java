@@ -10,6 +10,7 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -32,7 +33,7 @@ import io.dropwizard.jersey.caching.CacheControl;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTimeZone;
 
-@Path("club")
+@Path("api")
 @Slf4j
 public class ClassInfoResource {
     private final ClassScheduleManager scheduleManager;
@@ -45,7 +46,8 @@ public class ClassInfoResource {
 
     @GET
     @Timed
-    @Path("{clubId}/iCal")
+    @Path("club/{clubId}.ical")
+    @Produces("text/calendar")
     @CacheControl(maxAge = 12, maxAgeUnit = TimeUnit.HOURS)
     public Response getCalendar(@PathParam("clubId") final int clubId,
                                 @DefaultValue("America/Denver") @QueryParam("timeZone") final String timeZone) {

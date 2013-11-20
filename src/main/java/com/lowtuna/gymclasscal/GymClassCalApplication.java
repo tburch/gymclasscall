@@ -30,7 +30,9 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
 
     @Override
     public void run(GymClassCalConfig configuration, Environment environment) throws Exception {
-        TwentyFourHourParser parser = new TwentyFourHourParser(configuration.getClubListBaseUrl(), configuration.getClubDetailPattern(), configuration.getClubCalendarTemplate());
+        TwentyFourHourParser parser = new TwentyFourHourParser(configuration.getClubListBaseUrl(), configuration.getClubDetailPattern(), configuration.getClubCalendarTemplate(), environment.metrics(), configuration.getClubIdsUpdateDuration());
+        environment.healthChecks().register("24 Hour Fitness Schedule Parser", parser);
+
         ClassScheduleManager scheduleManager = new ClassScheduleManager(parser, configuration.getNumberOfWeekToLoad());
 
         ClassInfoResource classInfoResource = new ClassInfoResource(scheduleManager, parser);
