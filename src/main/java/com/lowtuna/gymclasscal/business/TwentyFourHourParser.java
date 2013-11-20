@@ -181,7 +181,7 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                 if (!clubDetails.isEmpty()) {
                     Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
                     if (matcher.matches()) {
-                        club = Club.builder().address(matcher.group(2).trim()).clubId(clubId).phoneNumber(matcher.group(3).trim()).name(matcher.group(1).trim()).build();
+                        club = Club.builder().address(matcher.group(2).trim().replaceAll("[^\\u0000-\\uFFFF]", "")).clubId(clubId).phoneNumber(matcher.group(3).trim().replaceAll("[^\\u0000-\\uFFFF]", "")).name(matcher.group(1).trim().replaceAll("[^\\u0000-\\uFFFF]", "")).build();
                         TwentyFourHourParser.log.debug("Parsed club to {}", club);
                     }
                 }
