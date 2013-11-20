@@ -3,9 +3,12 @@ package com.lowtuna.gymclasscal.jersey;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collection;
-import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -16,21 +19,31 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
-import biweekly.Biweekly;
-import biweekly.ICalendar;
-import biweekly.component.VEvent;
-import biweekly.property.DateStart;
-import biweekly.property.Location;
-import biweekly.property.ProductId;
-import biweekly.property.Summary;
-import biweekly.util.Duration;
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import com.lowtuna.gymclasscal.business.ClassScheduleManager;
 import com.lowtuna.gymclasscal.business.TwentyFourHourParser;
 import com.lowtuna.gymclasscal.core.ClassInfo;
 import com.lowtuna.gymclasscal.core.Club;
 import io.dropwizard.jersey.caching.CacheControl;
 import lombok.extern.slf4j.Slf4j;
+import net.fortuna.ical4j.data.CalendarOutputter;
+import net.fortuna.ical4j.extensions.property.WrCalName;
+import net.fortuna.ical4j.model.Calendar;
+import net.fortuna.ical4j.model.DateTime;
+import net.fortuna.ical4j.model.Dur;
+import net.fortuna.ical4j.model.ParameterList;
+import net.fortuna.ical4j.model.TimeZoneRegistry;
+import net.fortuna.ical4j.model.TimeZoneRegistryFactory;
+import net.fortuna.ical4j.model.ValidationException;
+import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.component.VTimeZone;
+import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.ProdId;
+import net.fortuna.ical4j.model.property.Uid;
+import net.fortuna.ical4j.model.property.Version;
 import org.joda.time.DateTimeZone;
 
 @Path("api")
@@ -49,32 +62,53 @@ public class ClassInfoResource {
     @Path("club/{clubId}/classes.ical")
     @Produces("text/calendar")
     @CacheControl(maxAge = 12, maxAgeUnit = TimeUnit.HOURS)
-    public Response getCalendar(@PathParam("clubId") final int clubId,
-                                @DefaultValue("America/Denver") @QueryParam("timeZone") final String timeZone) {
+    public Response getCalendar(@PathParam("clubId") int clubId,
+                                @QueryParam("class") final List<String> classes,
+                                @QueryParam("instructor") final List<String> instructors,
+                                @DefaultValue("America/Denver") @QueryParam("timeZone") String timeZone) {
+        Collection<ClassInfo> allClasses = scheduleManager.getClassInfos(clubId);
+
+        allClasses = Collections2.filter(allClasses, new Predicate<ClassInfo>() {
+            @Override
+            public boolean apply(@Nullable ClassInfo input) {
+                if (!classes.isEmpty()) {
+                    return classes.contains(input.getName());
+                }
+                if (!instructors.isEmpty()) {
+                    return instructors.contains(input.getInstructor());
+                }
+                return true;
+            }
+        });
+
+        Club club = parser.fetchClubInfo(clubId);
+        TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
+
+        final Calendar calendar = new Calendar();
+        calendar.getProperties().add(new ProdId("-//Tristan Burch//GymClassCal 1.0//EN"));
+        calendar.getProperties().add(Version.VERSION_2_0);
+        calendar.getProperties().add(CalScale.GREGORIAN);
+        VTimeZone tz = registry.getTimeZone(timeZone).getVTimeZone();
+        calendar.getComponents().add(tz);
+        calendar.getProperties().add(new WrCalName(new ParameterList(), WrCalName.FACTORY, "24 Hour Fitness Class Schedule - " + club.getName()));
+
+        for (ClassInfo classInfo: allClasses) {
+            DateTime start = new DateTime(classInfo.getTime().toDateTime(DateTimeZone.forID(timeZone)).toCalendar(Locale.US).getTime());
+            VEvent event = new VEvent(start, new Dur("1H"), classInfo.getName());
+            event.getProperties().add(new Uid(UUID.randomUUID().toString()));
+            event.getProperties().add(new Location(club.getAddress()));
+            calendar.getComponents().add(event);
+        }
+
         return Response.ok(new StreamingOutput() {
             @Override
             public void write(OutputStream output) throws IOException, WebApplicationException {
-                Collection<ClassInfo> allClasses = scheduleManager.getClassInfos(clubId);
-                Club club = parser.fetchClubInfo(clubId);
-                ICalendar iCal = new ICalendar();
-                iCal.setProperty(new Location(club.getAddress()));
-                iCal.setProductId(new ProductId("//Tristan Burch//GymClassCal//EN"));
-                iCal.addExperimentalProperty("X-WR-CALNAME", "24 Hour Fitness Class Schedule - " + club.getName());
-                for (ClassInfo classInfo: allClasses) {
-                    VEvent event = new VEvent();
-
-                    Summary summary = event.setSummary(classInfo.getName());
-                    summary.setLanguage("en-us");
-
-                    Date start = new Date(classInfo.getTime().toDateTime(DateTimeZone.forID(timeZone)).getMillis());
-                    DateStart dateStart = new DateStart(start, true);
-                    dateStart.setTimezoneId(timeZone);
-                    event.setDateStart(dateStart);
-                    event.setDuration(Duration.builder().hours(1).build());
-
-                    iCal.addEvent(event);
+                CalendarOutputter calendarOutputter = new CalendarOutputter();
+                try {
+                    calendarOutputter.output(calendar, output);
+                } catch (ValidationException e) {
+                    log.warn("iCal was invalid!", e);
                 }
-                Biweekly.write(iCal).go(output);
             }
         }).type("text/calendar").build();
     }
@@ -83,7 +117,7 @@ public class ClassInfoResource {
     @Timed
     @Path("club/{clubId}")
     @CacheControl(maxAge = 12, maxAgeUnit = TimeUnit.HOURS)
-    public Response getCalendar(@PathParam("clubId") final int clubId) {
+    public Response getCalendar(@PathParam("clubId") int clubId) {
         return Response.ok().entity(parser.fetchClubInfo(clubId)).build();
     }
 }

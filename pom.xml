@@ -69,9 +69,14 @@
             <version>1.7.2</version>
         </dependency>
         <dependency>
-            <groupId>net.sf.biweekly</groupId>
-            <artifactId>biweekly</artifactId>
-            <version>0.3.1</version>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j</artifactId>
+            <version>1.0.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mnode.ical4j</groupId>
+            <artifactId>ical4j-extensions</artifactId>
+            <version>0.9.2</version>
         </dependency>
         <dependency>
             <groupId>com.damnhandy</groupId>
