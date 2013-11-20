@@ -7,6 +7,7 @@ import com.lowtuna.gymclasscal.business.TwentyFourHourParser;
 import com.lowtuna.gymclasscal.config.GymClassCalConfig;
 import com.lowtuna.gymclasscal.core.ClassInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDate;
 import org.junit.Test;
 
 @Slf4j
@@ -15,7 +16,7 @@ public class TryTwentyFourHourClubParser {
 
     @Test
     public void tryFetchClubIds() {
-        TwentyFourHourParser parser = new TwentyFourHourParser(config.getBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarUriTemplate());
+        TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate());
         Set<Integer> clubIds = parser.fetchClubIds();
         log.debug("Club ids were {}", clubIds);
         log.debug("There were {} total clubs", clubIds.size());
@@ -23,19 +24,21 @@ public class TryTwentyFourHourClubParser {
 
     @Test
     public void tryFetchClassSchedules() {
-        TwentyFourHourParser parser = new TwentyFourHourParser(config.getBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarUriTemplate());
-        Set<ClassInfo> schedules = parser.fetchClassSchedules(592, 1);
+        LocalDate weekStart = (new LocalDate()).dayOfWeek().withMinimumValue();
+        TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate());
+        Set<ClassInfo> schedules = parser.fetchClassSchedules(592, weekStart);
         log.debug("Schedules were {}", schedules);
         log.debug("There were {} total schedules", schedules.size());
     }
 
     @Test
     public void tryFetchAllClassSchedules() {
-        TwentyFourHourParser parser = new TwentyFourHourParser(config.getBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarUriTemplate());
+        LocalDate weekStart = (new LocalDate()).dayOfWeek().withMinimumValue();
+        TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate());
         Set<ClassInfo> schedules = Sets.newHashSet();
         Set<Integer> clubIds = parser.fetchClubIds();
         for (Integer clubId: clubIds) {
-            Set<ClassInfo> clubSchedules = parser.fetchClassSchedules(clubId, 1);
+            Set<ClassInfo> clubSchedules = parser.fetchClassSchedules(clubId, weekStart);
             schedules.addAll(clubSchedules);
         }
         log.debug("There were {} total schedules", schedules.size());

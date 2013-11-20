@@ -7,12 +7,17 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.damnhandy.uri.template.UriTemplate;
 import com.damnhandy.uri.template.VariableExpansionException;
 import com.google.common.base.CaseFormat;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -51,6 +56,16 @@ public class TwentyFourHourParser {
         IMAGE_TO_CLASS_NAME = builder.build();
     }
 
+    private final LoadingCache<String, Document> documentCache = CacheBuilder.newBuilder()
+            .expireAfterWrite(1, TimeUnit.HOURS)
+            .recordStats()
+            .build(new CacheLoader<String, Document>() {
+                @Override
+                public Document load(String key) throws Exception {
+                    return Jsoup.connect(key).get();
+                }
+            });
+
     private final String baseClubListUrl;
     private final Pattern clubDetailPagePattern;
     private final UriTemplate clubCalendarUriTemplate;
@@ -61,68 +76,92 @@ public class TwentyFourHourParser {
         this.clubDetailPagePattern = Pattern.compile(clubDetailPagePattern);
     }
 
-    public Set<ClassInfo> fetchClassSchedules(int clubId, int numWeeks) {
+    public Club fetchClubInfo(int clubId) {
+        Club club = null;
+        TwentyFourHourParser.log.info("Getting club info for club with id={}", clubId);
+        try {
+            String fullUri = clubCalendarUriTemplate
+                    .set("club", clubId)
+                    .expand();
+            Document clubCalDoc = documentCache.get(fullUri);
+
+            if (club == null) {
+                Elements clubDetails = clubCalDoc.select("body div:eq(1) > table > tbody > tr:eq(1) > td > div");
+                if (!clubDetails.isEmpty()) {
+                    Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
+                    if (matcher.matches()) {
+                        club = Club.builder().address(matcher.group(2).trim()).clubId(clubId).phoneNumber(matcher.group(3).trim()).name(matcher.group(1).trim()).build();
+                        TwentyFourHourParser.log.debug("Parsed club to {}", club);
+                    }
+                }
+            }
+        } catch (VariableExpansionException e) {
+            log.error("Couldn't create club calendar schedule for clubId={}", club, e);
+        } catch (ExecutionException e) {
+            log.error("Couldn't get club calendar schedule for clubId={}", club, e);
+        }
+        return club;
+    }
+
+    public Set<ClassInfo> fetchClassSchedules(int clubId, LocalDate weekStart) {
         Set<ClassInfo> classes = Sets.newHashSet();
         Club club = null;
-        for (int i = 0; i < numWeeks; i++) {
-            LocalDate weekStart = (new LocalDate()).dayOfWeek().withMinimumValue().plusWeeks(i);
-            TwentyFourHourParser.log.debug("Getting class schedule for week starting {} for club with id={}", weekStart, clubId);
-            try {
-                String fullUri = clubCalendarUriTemplate
-                        .set("club", clubId)
-                        .set("date", DATE_PARAM_FORMATTER.print(weekStart))
-                        .expand();
-                Document clubCalDoc = Jsoup.connect(fullUri).get();
+        TwentyFourHourParser.log.info("Getting class schedule for week starting {} for club with id={}", weekStart, clubId);
+        try {
+            String fullUri = clubCalendarUriTemplate
+                    .set("club", clubId)
+                    .set("date", DATE_PARAM_FORMATTER.print(weekStart))
+                    .expand();
+            Document clubCalDoc = documentCache.get(fullUri);
 
-                if (club == null) {
-                    Elements clubDetails = clubCalDoc.select("body div:eq(1) > table > tbody > tr:eq(1) > td > div");
-                    if (!clubDetails.isEmpty()) {
-                        Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
-                        if (matcher.matches()) {
-                            club = Club.builder().address(matcher.group(2).trim()).id(clubId).phoneNumber(matcher.group(3).trim()).name(matcher.group(1).trim()).build();
-                            TwentyFourHourParser.log.debug("Parsed club to {}", club);
-                        }
+            if (club == null) {
+                Elements clubDetails = clubCalDoc.select("body div:eq(1) > table > tbody > tr:eq(1) > td > div");
+                if (!clubDetails.isEmpty()) {
+                    Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
+                    if (matcher.matches()) {
+                        club = Club.builder().address(matcher.group(2).trim()).clubId(clubId).phoneNumber(matcher.group(3).trim()).name(matcher.group(1).trim()).build();
+                        TwentyFourHourParser.log.debug("Parsed club to {}", club);
                     }
                 }
-
-                Elements weekOfEls = clubCalDoc.select("#WeekTitle");
-                if (!weekOfEls.isEmpty()) {
-                    DateTime weekDateTime = CALENDAR_WEEK_FORMATTER.parseDateTime(weekOfEls.iterator().next().html());
-
-                    Map<Integer, LocalDate> columnDate = Maps.newHashMap();
-                    Elements columns = clubCalDoc.select("#cal > tbody > tr > td > table > tbody > tr:eq(0) > td");
-                    populateColumnDates(weekDateTime, columnDate, columns);
-
-                    for (Element row: clubCalDoc.select("#cal > tbody > tr > td > table > tbody > tr:gt(0)")) {
-                        columns = row.select("td");
-                        DateTime time = null;
-                        for(int columnNdx = 0; columnNdx < columns.size(); columnNdx++) {
-                            Element element = columns.get(columnNdx);
-                            if (columnNdx == 0 && element.hasClass("hours")) {
-                                time = CALENDAR_TIME_FORMATTER.parseDateTime(element.text());
-                                continue;
-                            }
-
-                            if (time == null) {
-                                TwentyFourHourParser.log.error("Time for the row was null!");
-                                break;
-                            }
-
-                            LocalDate date = columnDate.get(columnNdx);
-
-                            LocalDateTime classDateTime = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), time.getHourOfDay(), time.getMinuteOfHour());
-                            TwentyFourHourParser.log.debug("Found class time of {}", classDateTime);
-
-                            List<ClassInfo> classInfoEntries = extractClassScheduleEntries(element, classDateTime);
-                            classes.addAll(classInfoEntries);
-                        }
-                    }
-                }
-            } catch (VariableExpansionException e) {
-                log.error("Couldn't create club calendar schedule for clubId={} and date={}", club, weekStart, e);
-            } catch (IOException e) {
-                log.error("Couldn't access club calendar schedule for clubId={} and date={}", club, weekStart, e);
             }
+
+            Elements weekOfEls = clubCalDoc.select("#WeekTitle");
+            if (!weekOfEls.isEmpty()) {
+                DateTime weekDateTime = CALENDAR_WEEK_FORMATTER.parseDateTime(weekOfEls.iterator().next().html());
+
+                Map<Integer, LocalDate> columnDate = Maps.newHashMap();
+                Elements columns = clubCalDoc.select("#cal > tbody > tr > td > table > tbody > tr:eq(0) > td");
+                populateColumnDates(weekDateTime, columnDate, columns);
+
+                for (Element row: clubCalDoc.select("#cal > tbody > tr > td > table > tbody > tr:gt(0)")) {
+                    columns = row.select("td");
+                    DateTime time = null;
+                    for(int columnNdx = 0; columnNdx < columns.size(); columnNdx++) {
+                        Element element = columns.get(columnNdx);
+                        if (columnNdx == 0 && element.hasClass("hours")) {
+                            time = CALENDAR_TIME_FORMATTER.parseDateTime(element.text());
+                            continue;
+                        }
+
+                        if (time == null) {
+                            TwentyFourHourParser.log.error("Time for the row was null!");
+                            break;
+                        }
+
+                        LocalDate date = columnDate.get(columnNdx);
+
+                        LocalDateTime classDateTime = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), time.getHourOfDay(), time.getMinuteOfHour());
+                        TwentyFourHourParser.log.debug("Found class time of {}", classDateTime);
+
+                        List<ClassInfo> classInfoEntries = extractClassScheduleEntries(element, classDateTime);
+                        classes.addAll(classInfoEntries);
+                    }
+                }
+            }
+        } catch (VariableExpansionException e) {
+            log.error("Couldn't create club calendar schedule for clubId={} and date={}", club, weekStart, e);
+        } catch (ExecutionException e) {
+            log.error("Couldn't access club calendar schedule for clubId={} and date={}", club, weekStart, e);
         }
         return classes;
     }
@@ -147,8 +186,9 @@ public class TwentyFourHourParser {
                 className = classLink.text();
             }
 
-            String details[] = StringUtils.splitByWholeSeparator(classEl.text(), " ");
-            String instructor = details[details.length - 1];
+            String stripped = classEl.html().replaceAll("<[^>]*>", "\r");
+            String details[] = StringUtils.splitByWholeSeparator(stripped, "\r");
+            String instructor = StringUtils.isEmpty(details[details.length - 1]) ? details[0] : details[details.length - 1];
 
             entries.add(ClassInfo.builder().name(className).time(classDateTime).instructor(instructor).build());
 
@@ -183,10 +223,10 @@ public class TwentyFourHourParser {
     private Set<String> getAllStateLinks(URI baseUri) {
         Set<String> stateLinks = Sets.newHashSet();
         try {
-            Document stateListDoc = Jsoup.connect(baseClubListUrl).get();
+            Document stateListDoc = documentCache.get(baseClubListUrl);
             Elements allStateLinks = stateListDoc.select("a");
             stateLinks.addAll(extractLinks(allStateLinks, baseUri.getPath()));
-        } catch (IOException e) {
+        } catch (ExecutionException e) {
             log.error("Couldn't get all state links for {}", baseClubListUrl, e);
         }
         return stateLinks;
@@ -212,7 +252,7 @@ public class TwentyFourHourParser {
         for (String cityLink: cityLinks) {
             try {
                 TwentyFourHourParser.log.debug("Following city link {}", cityLink);
-                Document cityClubsDoc = Jsoup.connect(cityLink).get();
+                Document cityClubsDoc = documentCache.get(cityLink);
                 Elements clubListLinks  = cityClubsDoc.select("#clubListTable tr.oddRow td a, #clubListTable tr.evenRow td a");
 
                 for (Element clubDetailsEl: clubListLinks) {
@@ -228,7 +268,7 @@ public class TwentyFourHourParser {
                         TwentyFourHourParser.log.debug("Found club ID of {}", clubId);
                     }
                 }
-            } catch (IOException e) {
+            } catch (ExecutionException e) {
                 log.error("Couldn't get city link for {}", cityLink, e);
             }
         }

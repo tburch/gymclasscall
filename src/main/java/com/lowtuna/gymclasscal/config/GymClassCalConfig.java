@@ -14,8 +14,11 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Slf4j
 public class GymClassCalConfig extends Configuration {
     @JsonProperty
+    private int numberOfWeekToLoad = 4;
+
+    @JsonProperty
     @NotEmpty
-    private String baseUrl = "http://www.24hourfitness.com/ClubList";
+    private String clubListBaseUrl = "http://www.24hourfitness.com/ClubList";
 
     @JsonProperty
     @NotEmpty
@@ -23,14 +26,14 @@ public class GymClassCalConfig extends Configuration {
 
     @JsonProperty
     @NotEmpty
-    private String clubCalendarUriTemplate = "http://24hourfit.schedulesource.com/public/gxschedule.aspx{?club,date}";
+    private String clubCalendarTemplate = "http://24hourfit.schedulesource.com/public/gxschedule.aspx{?club,date}";
 
-    public UriTemplate getClubCalendarUriTemplate() {
+    public UriTemplate getClubCalendarTemplate() {
         try {
-            return UriTemplate.fromTemplate(clubCalendarUriTemplate);
+            return UriTemplate.fromTemplate(clubCalendarTemplate);
         } catch (MalformedUriTemplateException e) {
-            log.warn("Couldn't create UriTemplate from template={}", clubCalendarUriTemplate, e);
-            throw new RuntimeException("Couldn't create UriTemplate from template=" + clubCalendarUriTemplate);
+            log.warn("Couldn't create UriTemplate from template={}", clubCalendarTemplate, e);
+            throw new RuntimeException("Couldn't create UriTemplate from template=" + clubCalendarTemplate);
         }
     }
 }
