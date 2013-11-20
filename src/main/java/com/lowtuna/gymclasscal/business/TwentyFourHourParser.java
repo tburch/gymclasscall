@@ -97,7 +97,7 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
     @GuardedBy("clubIdsLock")
     private Set<Integer> clubIds = Sets.newCopyOnWriteArraySet();
 
-    public TwentyFourHourParser(String baseClubListUrl, String clubDetailPagePattern, UriTemplate clubCalendarUriTemplate, MetricRegistry metricRegistry,  Duration clubIdsUpdateDuration) {
+    public TwentyFourHourParser(String baseClubListUrl, String clubDetailPagePattern, UriTemplate clubCalendarUriTemplate, MetricRegistry metricRegistry, Duration clubIdsUpdateDuration) {
         this.baseClubListUrl = baseClubListUrl;
         this.clubCalendarUriTemplate = clubCalendarUriTemplate;
         this.clubDetailPagePattern = Pattern.compile(clubDetailPagePattern);
@@ -187,16 +187,15 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                 }
             }
         } catch (VariableExpansionException e) {
-            log.error("Couldn't create club calendar schedule for clubId={}", club, e);
+            log.error("Couldn't create club calendar schedule for clubId={}", clubId, e);
         } catch (ExecutionException e) {
-            log.error("Couldn't get club calendar schedule for clubId={}", club, e);
+            log.error("Couldn't get club calendar schedule for clubId={}", clubId, e);
         }
         return club;
     }
 
     public Set<ClassInfo> fetchClassSchedules(int clubId, LocalDate weekStart) {
         Set<ClassInfo> classes = Sets.newHashSet();
-        Club club = null;
         TwentyFourHourParser.log.info("Getting class schedule for week starting {} for club with id={}", weekStart, clubId);
         try {
             String fullUri = clubCalendarUriTemplate
@@ -204,17 +203,6 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                     .set("date", DATE_PARAM_FORMATTER.print(weekStart))
                     .expand();
             Document clubCalDoc = clubCalendarDocumentCache.get(fullUri);
-
-            if (club == null) {
-                Elements clubDetails = clubCalDoc.select("body div:eq(1) > table > tbody > tr:eq(1) > td > div");
-                if (!clubDetails.isEmpty()) {
-                    Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
-                    if (matcher.matches()) {
-                        club = Club.builder().address(matcher.group(2).trim()).clubId(clubId).phoneNumber(matcher.group(3).trim()).name(matcher.group(1).trim()).build();
-                        TwentyFourHourParser.log.debug("Parsed club to {}", club);
-                    }
-                }
-            }
 
             Elements weekOfEls = clubCalDoc.select("#WeekTitle");
             if (!weekOfEls.isEmpty()) {
@@ -249,9 +237,9 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                 }
             }
         } catch (VariableExpansionException e) {
-            log.error("Couldn't create club calendar schedule for clubId={} and date={}", club, weekStart, e);
+            log.error("Couldn't create club calendar schedule for clubId={} and date={}", clubId, weekStart, e);
         } catch (ExecutionException e) {
-            log.error("Couldn't access club calendar schedule for clubId={} and date={}", club, weekStart, e);
+            log.error("Couldn't access club calendar schedule for clubId={} and date={}", clubId, weekStart, e);
         }
         return classes;
     }

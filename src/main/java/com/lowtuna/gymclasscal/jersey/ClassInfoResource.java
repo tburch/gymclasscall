@@ -46,7 +46,7 @@ public class ClassInfoResource {
 
     @GET
     @Timed
-    @Path("club/{clubId}.ical")
+    @Path("club/{clubId}/classes.ical")
     @Produces("text/calendar")
     @CacheControl(maxAge = 12, maxAgeUnit = TimeUnit.HOURS)
     public Response getCalendar(@PathParam("clubId") final int clubId,
@@ -58,7 +58,7 @@ public class ClassInfoResource {
                 Club club = parser.fetchClubInfo(clubId);
                 ICalendar iCal = new ICalendar();
                 iCal.setProperty(new Location(club.getAddress()));
-                iCal.setProductId(new ProductId("//Tristan Burch//GymClassCal//EN"));
+                iCal.setProductId(new ProductId("//GymClassCal//EN"));
                 iCal.addExperimentalProperty("X-WR-CALNAME", "24 Hour Fitness Class Schedule - " + club.getName());
                 for (ClassInfo classInfo: allClasses) {
                     VEvent event = new VEvent();
@@ -77,5 +77,13 @@ public class ClassInfoResource {
                 Biweekly.write(iCal).go(output);
             }
         }).type("text/calendar").build();
+    }
+
+    @GET
+    @Timed
+    @Path("club/{clubId}")
+    @CacheControl(maxAge = 12, maxAgeUnit = TimeUnit.HOURS)
+    public Response getCalendar(@PathParam("clubId") final int clubId) {
+        return Response.ok().entity(parser.fetchClubInfo(clubId)).build();
     }
 }

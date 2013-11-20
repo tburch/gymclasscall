@@ -1,0 +1,11 @@
+server:
+  requestLog:
+    appenders:
+    - type: "console"
+# Logging settings.
+logging:
+  level: INFO
+  loggers:
+    com.lowtuna.gymclasscal: DEBUG
+  appenders:
+  - type: "console"
