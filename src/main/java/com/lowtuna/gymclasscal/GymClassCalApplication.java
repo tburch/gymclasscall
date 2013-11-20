@@ -28,6 +28,7 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
             log.info("Replacing all occurrences of {} with {} in {}", PORT_KEY, port, args[args.length - 1]);
             config = config.replace(PORT_KEY, port);
             FileUtils.write(configFile, config);
+            args[1] = args[2];// remote herokuFix flag
         }
 
         new GymClassCalApplication().run(args);
