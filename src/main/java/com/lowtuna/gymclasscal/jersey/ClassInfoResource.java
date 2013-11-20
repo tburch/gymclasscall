@@ -58,7 +58,7 @@ public class ClassInfoResource {
                 Club club = parser.fetchClubInfo(clubId);
                 ICalendar iCal = new ICalendar();
                 iCal.setProperty(new Location(club.getAddress()));
-                iCal.setProductId(new ProductId("//GymClassCal//EN"));
+                iCal.setProductId(new ProductId("//Tristan Burch//GymClassCal//EN"));
                 iCal.addExperimentalProperty("X-WR-CALNAME", "24 Hour Fitness Class Schedule - " + club.getName());
                 for (ClassInfo classInfo: allClasses) {
                     VEvent event = new VEvent();
