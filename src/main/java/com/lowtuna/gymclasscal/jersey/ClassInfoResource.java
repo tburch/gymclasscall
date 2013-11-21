@@ -90,7 +90,7 @@ public class ClassInfoResource {
         calendar.getProperties().add(CalScale.GREGORIAN);
         VTimeZone tz = registry.getTimeZone(timeZone).getVTimeZone();
         calendar.getComponents().add(tz);
-        calendar.getProperties().add(new WrCalName(new ParameterList(), WrCalName.FACTORY, "24 Hour Fitness Class Schedule - " + club.getName()));
+        calendar.getProperties().add(new WrCalName(new ParameterList(), WrCalName.FACTORY, "24 Hour Fitness - " + club.getName()));
 
         for (ClassInfo classInfo: allClasses) {
             DateTime start = new DateTime(classInfo.getTime().toDateTime(DateTimeZone.forID(timeZone)).toCalendar(Locale.US).getTime());
