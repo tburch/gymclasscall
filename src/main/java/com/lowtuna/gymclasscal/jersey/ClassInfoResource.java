@@ -2,10 +2,7 @@ package com.lowtuna.gymclasscal.jersey;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -22,6 +19,7 @@ import javax.ws.rs.core.StreamingOutput;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 import com.lowtuna.gymclasscal.business.ClassScheduleManager;
 import com.lowtuna.gymclasscal.business.TwentyFourHourParser;
 import com.lowtuna.gymclasscal.core.ClassInfo;
@@ -81,6 +79,15 @@ public class ClassInfoResource {
             }
         });
 
+        List<ClassInfo> filteredClasses = Lists.newArrayList(allClasses);
+
+        Collections.sort(filteredClasses, new Comparator<ClassInfo>() {
+            @Override
+            public int compare(ClassInfo o1, ClassInfo o2) {
+                return o1.getTime().compareTo(o2.getTime());
+            }
+        });
+
         Club club = parser.fetchClubInfo(clubId);
         TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
@@ -92,7 +99,7 @@ public class ClassInfoResource {
         calendar.getComponents().add(tz);
         calendar.getProperties().add(new WrCalName(new ParameterList(), WrCalName.FACTORY, "24 Hour Fitness - " + club.getName()));
 
-        for (ClassInfo classInfo: allClasses) {
+        for (ClassInfo classInfo: filteredClasses) {
             DateTime start = new DateTime(classInfo.getTime().toDateTime(DateTimeZone.forID(timeZone)).toCalendar(Locale.US).getTime());
             VEvent event = new VEvent(start, new Dur("1H"), classInfo.getName());
             event.getProperties().add(new Uid(UUID.randomUUID().toString()));
