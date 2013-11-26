@@ -67,6 +67,8 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
         builder.put("../Images/24Hour/TURBO2010.jpg", "Turbo Kick");
         builder.put("../Images/24Hour/bodycombatlogo.jpg", "Body Combat");
         builder.put("../Images/24Hour/zumba.jpg", "Zumba");
+        builder.put("../Images/24Hour/LM-CXWORX.jpg", "CXWORX");
+        builder.put("../Images/24Hour/RPM.jpg", "RPM");
 
         IMAGE_TO_CLASS_NAME = builder.build();
     }
