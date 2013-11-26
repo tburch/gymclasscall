@@ -231,6 +231,10 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
 
                         LocalDate date = columnDate.get(columnNdx);
 
+                        if (date == null) {
+                            continue;
+                        }
+
                         LocalDateTime classDateTime = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), time.getHourOfDay(), time.getMinuteOfHour());
 
                         List<ClassInfo> classInfoEntries = extractClassScheduleEntries(element, classDateTime);
