@@ -3,6 +3,7 @@ package com.lowtuna.gymclasscal.parser.twentyfourhour;
 import java.util.Set;
 
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.collect.Sets;
 import com.lowtuna.gymclasscal.business.TwentyFourHourParser;
 import com.lowtuna.gymclasscal.config.GymClassCalConfig;
@@ -13,7 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 @Slf4j
 public class TryTwentyFourHourClubParser {
@@ -22,9 +26,32 @@ public class TryTwentyFourHourClubParser {
     @Mock(answer = Answers.RETURNS_SMART_NULLS)
     private MetricRegistry metricRegistry;
 
+    @Mock(answer = Answers.RETURNS_SMART_NULLS)
+    private Timer timer;
+
+    @Mock(answer = Answers.RETURNS_SMART_NULLS)
+    private Timer.Context timerContext;
+
     @Before
     public void initMockAnnotations() {
         MockitoAnnotations.initMocks(this);
+    }
+
+    @Before
+    public void initMetrics() {
+        Mockito.when(metricRegistry.timer(Mockito.anyString())).then(new Answer<Timer>() {
+            @Override
+            public Timer answer(InvocationOnMock invocation) throws Throwable {
+                return timer;
+            }
+        });
+
+        Mockito.when(timer.time()).then(new Answer<Timer.Context>() {
+            @Override
+            public Timer.Context answer(InvocationOnMock invocation) throws Throwable {
+                return timerContext;
+            }
+        });
     }
 
     @Test
