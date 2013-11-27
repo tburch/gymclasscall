@@ -26,6 +26,7 @@ import com.codahale.metrics.health.HealthCheck;
 import com.damnhandy.uri.template.UriTemplate;
 import com.damnhandy.uri.template.VariableExpansionException;
 import com.google.common.base.CaseFormat;
+import com.google.common.base.CharMatcher;
 import com.google.common.base.Stopwatch;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -183,7 +184,7 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                 if (!clubDetails.isEmpty()) {
                     Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
                     if (matcher.matches()) {
-                        club = Club.builder().address(matcher.group(2).trim().replaceAll("[^\\u0000-\\uFFFF]", "")).clubId(clubId).phoneNumber(matcher.group(3).trim().replaceAll("[^\\u0000-\\uFFFF]", "")).name(matcher.group(1).trim().replaceAll("[^\\u0000-\\uFFFF]", "")).build();
+                        club = Club.builder().address(CharMatcher.ASCII.retainFrom(matcher.group(2))).clubId(clubId).phoneNumber(CharMatcher.ASCII.retainFrom(matcher.group(3))).name(CharMatcher.ASCII.retainFrom(matcher.group(1))).build();
                         TwentyFourHourParser.log.debug("Parsed club to {}", club);
                     }
                 }
