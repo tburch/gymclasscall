@@ -12,7 +12,7 @@ public class RequestIdFilter implements ContainerRequestFilter {
     @Override
     public ContainerRequest filter(ContainerRequest request) {
         String requestId = request.getHeaderValue(REQUEST_ID_HEADER);
-        if (StringUtils.isEmpty(requestId)) {
+        if (StringUtils.isNotEmpty(requestId)) {
             MDC.put(REQUEST_ID_LOG_NAME, requestId);
         }
         return request;
