@@ -63,7 +63,7 @@ public class ClassInfoResource {
         this.scheduleManager = scheduleManager;
         this.parser = parser;
 
-        this.icalTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "iCal", "generation"));
+        this.icalTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "getCalendar", "iCalGeneration"));
     }
 
     @GET
