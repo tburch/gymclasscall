@@ -1,5 +1,9 @@
 package com.lowtuna.gymclasscal.business;
 
+import java.util.Collection;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.lowtuna.gymclasscal.config.GymClassCalConfig;
@@ -13,8 +17,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-
-import java.util.Collection;
 
 @Slf4j
 public class TryClassScheduleManager {
@@ -53,8 +55,9 @@ public class TryClassScheduleManager {
 
     @Test
     public void testGetMultipleWeeks() {
+        ExecutorService executorService = Executors.newCachedThreadPool();
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null);
-        ClassScheduleManager manager = new ClassScheduleManager(parser, 4);
+        ClassScheduleManager manager = new ClassScheduleManager(parser, 4, executorService);
         Collection<ClassInfo> allClasses = manager.getClassInfos(572);
         TryClassScheduleManager.log.debug("Found {} classes over 4 weeks", allClasses.size());
 

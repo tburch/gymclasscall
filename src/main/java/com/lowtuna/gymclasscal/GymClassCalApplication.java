@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.lang.reflect.Array;
 import java.util.EnumSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.Filter;
@@ -107,7 +108,8 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
         TwentyFourHourParser parser = new TwentyFourHourParser(configuration.getClubListBaseUrl(), configuration.getClubDetailPattern(), configuration.getClubCalendarTemplate(), environment.metrics(), configuration.getClubIdsUpdateDuration());
         environment.healthChecks().register("24 Hour Fitness Schedule Parser", parser);
 
-        ClassScheduleManager scheduleManager = new ClassScheduleManager(parser, configuration.getNumberOfWeekToLoad());
+        ExecutorService scheduleManagerExecutorService = environment.lifecycle().executorService("scheduleManagerExecutorService-%d").maxThreads(80).build();
+        ClassScheduleManager scheduleManager = new ClassScheduleManager(parser, configuration.getNumberOfWeekToLoad(), scheduleManagerExecutorService);
 
         ClassInfoResource classInfoResource = new ClassInfoResource(scheduleManager, parser, environment.metrics());
         environment.jersey().register(classInfoResource);
