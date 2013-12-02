@@ -55,7 +55,7 @@ import org.jsoup.select.Elements;
 
 @Slf4j
 public class TwentyFourHourParser extends HealthCheck implements Managed {
-    private static final DateTimeFormatter DATE_PARAM_FORMATTER = DateTimeFormat.forPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter DATE_PARAM_FORMATTER = DateTimeFormat.forPattern("MM/dd/yyyy");
     private static final DateTimeFormatter CALENDAR_DATE_FORMATTER = DateTimeFormat.forPattern("MMM-d");
     private static final Pattern CALENDAR_DATE_PATTERN = Pattern.compile("^\\w+ ([A-Za-z]{3}\\-[\\d]{1,2})$");
     private static final DateTimeFormatter CALENDAR_TIME_FORMATTER = DateTimeFormat.forPattern("h:mma");

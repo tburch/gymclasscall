@@ -1,4 +1,4 @@
-package com.lowtuna.gymclasscal.parser.twentyfourhour;
+package com.lowtuna.gymclasscal.business;
 
 import java.util.Set;
 
@@ -58,8 +58,8 @@ public class TryTwentyFourHourClubParser {
     public void tryFetchClubIds() {
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null);
         Set<Integer> clubIds = parser.getClubIds();
-        log.debug("Club ids were {}", clubIds);
-        log.debug("There were {} total clubs", clubIds.size());
+        TryTwentyFourHourClubParser.log.debug("Club ids were {}", clubIds);
+        TryTwentyFourHourClubParser.log.debug("There were {} total clubs", clubIds.size());
     }
 
     @Test
@@ -67,8 +67,8 @@ public class TryTwentyFourHourClubParser {
         LocalDate weekStart = (new LocalDate()).dayOfWeek().withMinimumValue();
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null);
         Set<ClassInfo> schedules = parser.fetchClassSchedules(572, weekStart);
-        log.debug("Schedules were {}", schedules);
-        log.debug("There were {} total schedules", schedules.size());
+        TryTwentyFourHourClubParser.log.debug("Schedules were {}", schedules);
+        TryTwentyFourHourClubParser.log.debug("There were {} total schedules", schedules.size());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class TryTwentyFourHourClubParser {
             Set<ClassInfo> clubSchedules = parser.fetchClassSchedules(clubId, weekStart);
             schedules.addAll(clubSchedules);
         }
-        log.debug("There were {} total schedules", schedules.size());
+        TryTwentyFourHourClubParser.log.debug("There were {} total schedules", schedules.size());
     }
 
 }

@@ -1,5 +1,6 @@
 package com.lowtuna.gymclasscal.business;
 
+import java.util.Collection;
 import java.util.Set;
 
 import com.google.common.collect.Sets;
@@ -19,7 +20,8 @@ public class ClassScheduleManager {
         Set<ClassInfo> classes = Sets.newHashSet();
         for (int i = 0; i < numWeeks; i++) {
             LocalDate weekStart = (new LocalDate()).dayOfWeek().withMinimumValue().plusWeeks(i);
-            classes.addAll(parser.fetchClassSchedules(clubId, weekStart));
+            Collection<ClassInfo> weekClasses = parser.fetchClassSchedules(clubId, weekStart);
+            classes.addAll(weekClasses);
         }
         return classes;
     }
