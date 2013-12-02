@@ -66,7 +66,7 @@ public class TryTwentyFourHourClubParser {
     public void tryFetchClassSchedules() {
         LocalDate weekStart = (new LocalDate()).dayOfWeek().withMinimumValue();
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null);
-        Set<ClassInfo> schedules = parser.fetchClassSchedules(592, weekStart);
+        Set<ClassInfo> schedules = parser.fetchClassSchedules(572, weekStart);
         log.debug("Schedules were {}", schedules);
         log.debug("There were {} total schedules", schedules.size());
     }

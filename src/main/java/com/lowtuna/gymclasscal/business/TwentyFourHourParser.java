@@ -47,6 +47,7 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -84,7 +85,12 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                 public Document load(String key) throws Exception {
                     Timer.Context timerContext = clubCalendarRequestTimer.time();
                     try {
-                        return Jsoup.connect(key).get();
+                        Connection.Response response = Jsoup.connect(key).execute();
+                        if (response.statusCode() == 200) {
+                            return response.parse();
+                        }
+                        log.warn("Received non-200 response code ({}) from {}", response.statusCode(), key);
+                        throw new RuntimeException("Received non-200 status code from " + key);
                     } finally {
                         timerContext.stop();
                     }
@@ -248,6 +254,7 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
         } catch (ExecutionException e) {
             log.error("Couldn't access club calendar schedule for clubId={} and date={}", clubId, weekStart, e);
         }
+        log.info("Fetched {} class schedules for week starting {} for club with id={}", classes.size(), weekStart, clubId);
         return classes;
     }
 
