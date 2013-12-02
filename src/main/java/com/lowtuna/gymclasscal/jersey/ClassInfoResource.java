@@ -66,6 +66,8 @@ public class ClassInfoResource {
                                 @DefaultValue("America/Denver") @QueryParam("timeZone") String timeZone) {
         Collection<ClassInfo> allClasses = scheduleManager.getClassInfos(clubId);
 
+        log.debug("Found {} total classes before filtering", allClasses.size());
+
         allClasses = Collections2.filter(allClasses, new Predicate<ClassInfo>() {
             @Override
             public boolean apply(@Nullable ClassInfo input) {
@@ -80,6 +82,8 @@ public class ClassInfoResource {
         });
 
         List<ClassInfo> filteredClasses = Lists.newArrayList(allClasses);
+
+        log.debug("Found {} total classes after filtering", filteredClasses.size());
 
         Collections.sort(filteredClasses, new Comparator<ClassInfo>() {
             @Override
