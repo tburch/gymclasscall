@@ -56,7 +56,7 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
 
         ClassScheduleManager scheduleManager = new ClassScheduleManager(parser, configuration.getNumberOfWeekToLoad());
 
-        ClassInfoResource classInfoResource = new ClassInfoResource(scheduleManager, parser);
+        ClassInfoResource classInfoResource = new ClassInfoResource(scheduleManager, parser, environment.metrics());
         environment.jersey().register(classInfoResource);
     }
 }

@@ -2,7 +2,12 @@ package com.lowtuna.gymclasscal.jersey;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -16,6 +21,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -38,6 +45,7 @@ import net.fortuna.ical4j.model.ValidationException;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.CalScale;
+import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.Location;
 import net.fortuna.ical4j.model.property.ProdId;
 import net.fortuna.ical4j.model.property.Uid;
@@ -49,10 +57,13 @@ import org.joda.time.DateTimeZone;
 public class ClassInfoResource {
     private final ClassScheduleManager scheduleManager;
     private final TwentyFourHourParser parser;
+    private final Timer icalTimer;
 
-    public ClassInfoResource(ClassScheduleManager scheduleManager, TwentyFourHourParser parser) {
+    public ClassInfoResource(ClassScheduleManager scheduleManager, TwentyFourHourParser parser, MetricRegistry metricRegistry) {
         this.scheduleManager = scheduleManager;
         this.parser = parser;
+
+        this.icalTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "iCal", "generation"));
     }
 
     @GET
@@ -95,6 +106,8 @@ public class ClassInfoResource {
         Club club = parser.fetchClubInfo(clubId);
         TimeZoneRegistry registry = TimeZoneRegistryFactory.getInstance().createRegistry();
 
+        final Timer.Context iCalTimerContext = icalTimer.time();
+
         final Calendar calendar = new Calendar();
         calendar.getProperties().add(new ProdId("-//Tristan Burch//GymClassCal 1.0//EN"));
         calendar.getProperties().add(Version.VERSION_2_0);
@@ -108,6 +121,7 @@ public class ClassInfoResource {
             VEvent event = new VEvent(start, new Dur("1H"), classInfo.getName());
             event.getProperties().add(new Uid(UUID.randomUUID().toString()));
             event.getProperties().add(new Location(club.getAddress()));
+            event.getProperties().add(new Description(classInfo.getInstructor()));
             calendar.getComponents().add(event);
         }
 
@@ -119,6 +133,8 @@ public class ClassInfoResource {
                     calendarOutputter.output(calendar, output);
                 } catch (ValidationException e) {
                     log.warn("iCal was invalid!", e);
+                } finally {
+                    iCalTimerContext.stop();
                 }
             }
         }).type("text/calendar").build();
