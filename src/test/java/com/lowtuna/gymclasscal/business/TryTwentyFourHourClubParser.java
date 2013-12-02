@@ -5,9 +5,9 @@ import java.util.Set;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Sets;
-import com.lowtuna.gymclasscal.business.TwentyFourHourParser;
 import com.lowtuna.gymclasscal.config.GymClassCalConfig;
 import com.lowtuna.gymclasscal.core.ClassInfo;
+import com.lowtuna.gymclasscal.core.Club;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.LocalDate;
 import org.junit.Before;
@@ -52,6 +52,13 @@ public class TryTwentyFourHourClubParser {
                 return timerContext;
             }
         });
+    }
+
+    @Test
+    public void tryFetchClubDetails() {
+        TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null);
+        Club club = parser.fetchClubInfo(572);
+        TryTwentyFourHourClubParser.log.debug("Club details were {}", club);
     }
 
     @Test

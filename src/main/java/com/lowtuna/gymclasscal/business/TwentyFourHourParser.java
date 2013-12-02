@@ -190,7 +190,10 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                 if (!clubDetails.isEmpty()) {
                     Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
                     if (matcher.matches()) {
-                        club = Club.builder().address(CharMatcher.ASCII.retainFrom(matcher.group(2))).clubId(clubId).phoneNumber(CharMatcher.ASCII.retainFrom(matcher.group(3))).name(CharMatcher.ASCII.retainFrom(matcher.group(1))).build();
+                        String address = CharMatcher.ASCII.retainFrom(CharMatcher.INVISIBLE.replaceFrom(matcher.group(2), " ")).trim();
+                        String phone = CharMatcher.ASCII.retainFrom(CharMatcher.INVISIBLE.replaceFrom(matcher.group(3), " ")).trim();
+                        String name = CharMatcher.ASCII.retainFrom(CharMatcher.INVISIBLE.replaceFrom(matcher.group(1), " ")).trim();
+                        club = Club.builder().address(address).clubId(clubId).phoneNumber(phone).name(name).build();
                         TwentyFourHourParser.log.debug("Parsed club to {}", club);
                     }
                 }
