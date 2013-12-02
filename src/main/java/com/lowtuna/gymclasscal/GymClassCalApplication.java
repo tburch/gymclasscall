@@ -22,6 +22,7 @@ import com.lowtuna.gymclasscal.business.ClassScheduleManager;
 import com.lowtuna.gymclasscal.business.TwentyFourHourParser;
 import com.lowtuna.gymclasscal.config.GymClassCalConfig;
 import com.lowtuna.gymclasscal.jersey.ClassInfoResource;
+import com.lowtuna.gymclasscal.jersey.RequestIdFilter;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -110,5 +111,7 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
 
         ClassInfoResource classInfoResource = new ClassInfoResource(scheduleManager, parser, environment.metrics());
         environment.jersey().register(classInfoResource);
+
+        environment.jersey().getResourceConfig().getContainerRequestFilters().add(RequestIdFilter.class);
     }
 }
