@@ -121,7 +121,7 @@ public class ClassInfoResource {
             VEvent event = new VEvent(start, new Dur("1H"), classInfo.getName());
             event.getProperties().add(new Uid(UUID.randomUUID().toString()));
             event.getProperties().add(new Location(club.getAddress()));
-            event.getProperties().add(new Description(classInfo.getInstructor()));
+            event.getProperties().add(new Description("Instructor: " + classInfo.getInstructor()));
             calendar.getComponents().add(event);
         }
 
