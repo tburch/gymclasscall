@@ -2,7 +2,7 @@ server:
   requestLog:
       appenders:
       - type: "console"
-        logFormat: "%-5p [%d{ISO8601}] [%thread] [%X{requestId}] %c: %m%n%xEx"
+        logFormat: "%-5p [%d{ISO8601}] [%thread] [%X{requestId}] %c{1.}: %m%n%xEx"
   applicationConnectors:
   - type: "http"
     port: PORTPORT
@@ -17,4 +17,4 @@ logging:
     com.lowtuna.gymclasscal: DEBUG
   appenders:
   - type: "console"
-    logFormat: "%-5p [%d{ISO8601}] [%thread] [%X{requestId}] %c: %m%n%xEx"
+    logFormat: "%-5p [%d{ISO8601}] [%thread] [%X{requestId}] %c{1.}: %m%n%xEx"
