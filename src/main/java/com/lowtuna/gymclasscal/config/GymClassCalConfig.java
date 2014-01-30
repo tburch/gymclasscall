@@ -3,12 +3,16 @@ package com.lowtuna.gymclasscal.config;
 import com.damnhandy.uri.template.MalformedUriTemplateException;
 import com.damnhandy.uri.template.UriTemplate;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.jaxrs.json.annotation.JSONP;
+import com.lowtuna.dropwizard.extras.config.ElasticSearchConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -31,6 +35,10 @@ public class GymClassCalConfig extends Configuration {
     @JsonProperty
     @NotEmpty
     private String clubCalendarTemplate = "http://24hourfit.schedulesource.com/public/gxschedule.aspx{?club,date}";
+
+    @JsonProperty
+    @NotNull
+    private ElasticSearchConfig elasticSearch = new ElasticSearchConfig();
 
     public UriTemplate getClubCalendarTemplate() {
         try {
