@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -27,7 +28,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.when;
 
 @Slf4j
-public class TryClassScheduleManager {
+public class TestClassScheduleManager {
     private GymClassCalConfig config = new GymClassCalConfig();
 
     @Mock(answer = Answers.RETURNS_SMART_NULLS)
@@ -64,12 +65,28 @@ public class TryClassScheduleManager {
         });
     }
 
+    private AtomicInteger documentRequestCount = new AtomicInteger(0);
+
     @Before
     public void initDocumentLoader() {
         when(documentLoader.loadDocument(anyString())).then(new Answer<Optional<Document>>() {
             @Override
             public Optional<Document> answer(InvocationOnMock invocation) throws Throwable {
-                InputStream is = getClass().getClassLoader().getResourceAsStream("572_2014-01-27.html");
+                InputStream is = null;
+                switch (documentRequestCount.incrementAndGet()) {
+                    case 1:
+                        is = getClass().getClassLoader().getResourceAsStream("572_2014-01-27.html");
+                        break;
+                    case 2:
+                        is = getClass().getClassLoader().getResourceAsStream("572_2014-02-03.html");
+                        break;
+                    case 3:
+                        is = getClass().getClassLoader().getResourceAsStream("572_2014-02-10.html");
+                        break;
+                    case 4:
+                        is = getClass().getClassLoader().getResourceAsStream("572_2014-02-17.html");
+                        break;
+                }
                 Document document = Jsoup.parse(is, "utf-8", "http://24hourfit.schedulesource.com/public/");
                 return Optional.fromNullable(document);
             }
@@ -82,7 +99,6 @@ public class TryClassScheduleManager {
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null, documentLoader);
         ClassScheduleManager manager = new ClassScheduleManager(parser, 4, executorService);
         Collection<ClassInfo> allClasses = manager.getClassInfos(572);
-        TryClassScheduleManager.log.debug("Found {} classes over 4 weeks", allClasses.size());
-
+        TestClassScheduleManager.log.debug("Found {} classes over 4 weeks", allClasses.size());
     }
 }

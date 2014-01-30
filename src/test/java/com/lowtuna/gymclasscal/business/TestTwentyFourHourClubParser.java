@@ -19,7 +19,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -27,7 +26,7 @@ import org.mockito.stubbing.Answer;
 import static org.mockito.Mockito.*;
 
 @Slf4j
-public class TryTwentyFourHourClubParser {
+public class TestTwentyFourHourClubParser {
     private GymClassCalConfig config = new GymClassCalConfig();
 
     @Mock(answer = Answers.RETURNS_SMART_NULLS)
@@ -80,15 +79,15 @@ public class TryTwentyFourHourClubParser {
     public void tryFetchClubDetails() {
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null, documentLoader);
         Club club = parser.fetchClubInfo(572);
-        TryTwentyFourHourClubParser.log.debug("Club details were {}", club);
+        TestTwentyFourHourClubParser.log.debug("Club details were {}", club);
     }
 
     @Test
     public void tryFetchClubIds() {
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null, documentLoader);
         Set<Integer> clubIds = parser.getClubIds();
-        TryTwentyFourHourClubParser.log.debug("Club ids were {}", clubIds);
-        TryTwentyFourHourClubParser.log.debug("There were {} total clubs", clubIds.size());
+        TestTwentyFourHourClubParser.log.debug("Club ids were {}", clubIds);
+        TestTwentyFourHourClubParser.log.debug("There were {} total clubs", clubIds.size());
     }
 
     @Test
@@ -96,8 +95,8 @@ public class TryTwentyFourHourClubParser {
         LocalDate weekStart = (new LocalDate()).dayOfWeek().withMinimumValue();
         TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null, documentLoader);
         Set<ClassInfo> schedules = parser.fetchClassSchedules(572, weekStart);
-        TryTwentyFourHourClubParser.log.debug("Schedules were {}", schedules);
-        TryTwentyFourHourClubParser.log.debug("There were {} total schedules", schedules.size());
+        TestTwentyFourHourClubParser.log.debug("Schedules were {}", schedules);
+        TestTwentyFourHourClubParser.log.debug("There were {} total schedules", schedules.size());
     }
 
     @Test
@@ -110,7 +109,7 @@ public class TryTwentyFourHourClubParser {
             Set<ClassInfo> clubSchedules = parser.fetchClassSchedules(clubId, weekStart);
             schedules.addAll(clubSchedules);
         }
-        TryTwentyFourHourClubParser.log.debug("There were {} total schedules", schedules.size());
+        TestTwentyFourHourClubParser.log.debug("There were {} total schedules", schedules.size());
     }
 
 }
