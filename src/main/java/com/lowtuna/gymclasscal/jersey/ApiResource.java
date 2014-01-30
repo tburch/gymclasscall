@@ -54,12 +54,12 @@ import org.joda.time.DateTimeZone;
 
 @Path("api")
 @Slf4j
-public class ClassInfoResource {
+public class ApiResource {
     private final ClassScheduleManager scheduleManager;
     private final TwentyFourHourParser parser;
     private final Timer icalTimer;
 
-    public ClassInfoResource(ClassScheduleManager scheduleManager, TwentyFourHourParser parser, MetricRegistry metricRegistry) {
+    public ApiResource(ClassScheduleManager scheduleManager, TwentyFourHourParser parser, MetricRegistry metricRegistry) {
         this.scheduleManager = scheduleManager;
         this.parser = parser;
 
@@ -68,7 +68,7 @@ public class ClassInfoResource {
 
     @GET
     @Timed
-    @Path("club/{clubId}/classes.ical")
+    @Path("club/{clubId}/classes.ics")
     @Produces("text/calendar")
     @CacheControl(maxAge = 12, maxAgeUnit = TimeUnit.HOURS)
     public Response getCalendar(@PathParam("clubId") int clubId,
@@ -77,7 +77,7 @@ public class ClassInfoResource {
                                 @DefaultValue("America/Denver") @QueryParam("timeZone") String timeZone) {
         Collection<ClassInfo> allClasses = scheduleManager.getClassInfos(clubId);
 
-        log.debug("Found {} total classes before filtering", allClasses.size());
+        ApiResource.log.debug("Found {} total classes before filtering", allClasses.size());
 
         allClasses = Collections2.filter(allClasses, new Predicate<ClassInfo>() {
             @Override
@@ -94,7 +94,7 @@ public class ClassInfoResource {
 
         List<ClassInfo> filteredClasses = Lists.newArrayList(allClasses);
 
-        log.debug("Found {} total classes after filtering", filteredClasses.size());
+        ApiResource.log.debug("Found {} total classes after filtering", filteredClasses.size());
 
         Collections.sort(filteredClasses, new Comparator<ClassInfo>() {
             @Override
@@ -132,7 +132,7 @@ public class ClassInfoResource {
                 try {
                     calendarOutputter.output(calendar, output);
                 } catch (ValidationException e) {
-                    log.warn("iCal was invalid!", e);
+                    ApiResource.log.warn("iCal was invalid!", e);
                 } finally {
                     iCalTimerContext.stop();
                 }

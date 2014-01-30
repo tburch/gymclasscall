@@ -1,1 +1,1 @@
-web    java $JAVA_OPTS -jar target/GymClassCal.jar server herokuFix target/config/gymClassCal.yml
+web    java $JAVA_OPTS -jar target/GymClassCal.jar server target/config/gymClassCal.yml

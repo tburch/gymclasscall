@@ -104,6 +104,16 @@
             <artifactId>jetty-util</artifactId>
             <version>6.1.25</version>
         </dependency>
+        <dependency>
+            <groupId>com.lowtuna.dropwizard-extras</groupId>
+            <artifactId>dropwizard-extras-view-handlebars</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>1.0.0.RC1</version>
+        </dependency>
     </dependencies>
 
     <build>

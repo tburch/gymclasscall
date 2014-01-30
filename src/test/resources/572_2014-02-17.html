@@ -1,0 +1,445 @@
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+	Lowry Sport
+</title>
+    <style type="text/css">
+    
+        #cal td {text-align:center; }
+        a.cLink {margin-top:4px; }
+    </style>
+
+	<link rel="stylesheet" type="text/css" href="gxSched1.css" media="all" /><link rel="stylesheet" type="text/css" href="gxPrint.css" media="print" />
+
+    <style type='text/css'>
+        body {margin-top:0px;}
+        .buttonView 
+        {
+        	border-width:thin;
+        	border-color:Black;
+        	border-style:solid;
+        	background-color:#efefef;
+            padding:5px;
+        }
+    </style>
+    
+    <script language="JavaScript" type="text/javascript" src="/Common/js/popDivs.js" ></script>
+	
+	<script language="javascript" type="text/javascript">
+	
+	function showDesc(day, title, text)	{
+		var left = 0;
+		if (day == 4 )  {  left=-120;  }
+		if (day == 5 || day==6 || day==7)  {  left=-240;  }
+		var obj = document.getElementById("classname");
+		obj.innerHTML = title;
+		
+		obj = document.getElementById("classdesc");
+		obj.innerHTML = text;
+		
+		showDiv("popDesc",left,8);
+
+    }
+
+    function PopClass(day, id) {
+        var left = 0;
+        if (day == 4) { left = -120; }
+        if (day == 5 || day == 6 || day == 7) { left = -240; }
+        var obj = document.getElementById("classname");
+        obj.innerHTML = GetTitle(id);
+
+        obj = document.getElementById("classdesc");
+        obj.innerHTML = GetText(id);
+
+        showDiv("popDesc", left, 8);
+    }
+    
+	</script>
+	
+    
+	<script type='text/javascript'>
+function GetTitle(id) { var t; switch(id) {  case 261: t="SilverSneakers® Classic"; break; 
+ case 409: t="Zumba® Gold"; break; 
+ case 250: t="Yoga"; break; 
+ case 235: t="Cycle"; break; 
+ case 435: t="BODYPUMP™"; break; 
+ case 366: t="Step"; break; 
+ case 539: t="RPM™"; break; 
+ case 600: t="Zumba® Step"; break; 
+ case 332: t="Zumba®"; break; 
+ case 399: t="Aqua"; break; 
+ case 232: t="Turbo Kick®"; break; 
+ case 519: t="BODYCOMBAT™"; break; 
+ case 260: t="SilverSneakers® Circuit"; break; 
+ case 445: t="Step & Strength"; break; 
+ case 243: t="Pilates"; break; 
+ case 549: t="CXWORX™"; break; 
+ case 367: t="Senior Fitness"; break; 
+ case 225: t="Boot Camp"; break; 
+ case 531: t="HIIT (High Intensity Interval Training)"; break; 
+default:    t = "";  }  return t;}
+function GetText(id) { var t; switch(id) {  case 261: t="Have fun and move to the music through a variety of exercises designed to increase muscular strength, range of movement and activities for daily living. Hand-held weights, elastic tubing with handles, and a SilverSneakers ball are offered for resistance. A chair is used for seated and/or standing support."; break; 
+ case 409: t="Zumba for the active adult population or the true beginning Zumba participant, this class uses the same fun Zumba recipe and is a combination of fast and slow synchronized movements designed to keep you in shape, burn calories and have fun! The class is set to great music to keep you motivated!"; break; 
+ case 250: t="Designed to enhance vitality and a sense of well being, this workout will help participants gain improved flexibility, balance, strength and posture. The class will borrow from each instructor’s experience with Yoga and may incorporate basic poses from various Yoga styles."; break; 
+ case 235: t="We bring you an outdoor cycling experience indoors with this athletic and authentic cycling ride. Motivating instruction and driving music will keep you energized as you are lead through a workout comprised of a variety of hill climbs, flat terrains, head winds, tail winds, and anaerobic intervals.  Each workout is different as the instructor picks the terrain and sets the goals for each class."; break; 
+ case 435: t="BODYPUMP™ is the original barbell class that strengthens your entire body. This 60-minute workout challenges all your major muscle groups by using the best weight-room exercises like squats, presses, lifts and curls. "; break; 
+ case 366: t="Movements performed on and off a step platform with or without risers. This class consists of medium level movement patterns. Intensity level determined by speed, travel, and execution of movements."; break; 
+ case 539: t="RPM™ is the indoor cycling workout where you ride to the rhythm of powerful music. Take on the terrain with your inspiring team coach who leads the pack through hills, flats, mountain peaks, time trials, and interval training. Discover your athlete within – sweat and burn to reach your endorphin high."; break; 
+ case 600: t="All of the Step toning and strengthening for your legs and glutes. All of the Zumba® fitness-party fun you love."; break; 
+ case 332: t="This workout combines high energy and motivating music with synchronized dance movements designed for any fitness level. The routines feature aerobic fitness interval training with a combination of fast and slow rhythms that tone and sculpt the body. Want to burn some calories and have fun? Then Zumba is for you!"; break; 
+ case 399: t="This popular water workout includes cardio and resistance training to help tone and sculpt without impact to the joints. Resistance tools may include buoyant water weights and noodles."; break; 
+ case 232: t="Pre-designed Kickboxing interval class using no equipment. Cardio section uses intensity drills and increased energy sprints followed by work recovery segments."; break; 
+ case 519: t="BODYCOMBAT™ is the empowering cardio workout where you are totally unleashed. This fiercely energetic program is inspired by martial arts and draws from a wide array of disciplines such as karate, boxing, taekwondo, tai chi and muay thai. Supported by driving music and powerful role model instructors, you strike, punch, kick and kata your way through calories to superior cardio fitness."; break; 
+ case 260: t="Combine fun with fitness to increase your cardiovascular and muscular endurance power with a standing circuit workout. Upper body strength work with hand-held weights, elastic tubing with handles and a SilverSneakers ball is alternated with non-impact aerobic choreography. A chair is offered for support, stretching and relaxation exercises.\n"; break; 
+ case 445: t="Shake up your workout with step and strength intervals. Burn calories, increase your level of cardiovascular fitness and tone your muscles all in one workout. You will be motivated from start \nto finish during this group exercise class!"; break; 
+ case 243: t="A workout designed to develop core strength and coordination, the focus of this class will be on traditional Pilates movement patterns, the use of breath and correct alignment. Participants will enjoy improvement in posture and overall toning."; break; 
+ case 549: t="CXWORX™ is a 30-minute revolution in core training, transforming the muscles that power your body every day. Our tried-and-true formula of great choreography and chart-topping music, presented by inspirational instructors and backed by cutting-edge scientific research, will help you run faster… play harder… stand stronger. "; break; 
+ case 367: t="Whether you are a group fitness veteran or newly exploring this venue, you can customize this class to meet your needs as an independent older adult. Strength, endurance, mobility, and flexibility are all components of the workout."; break; 
+ case 225: t="This adrenaline pumping cardio and strength session incorporates plyometrics coupled with high volume resistance training boosting metabolism, endurance, and overall fitness. It’s the perfect combination of extreme heart pumping cardio and pure strength training to challenge any fitness level."; break; 
+ case 531: t="This equipment free cardio workout is sure to get your heart beating and the fat burning while alternating moderately-paced moves with segments of more intense, easy to follow exercise moves.  Studies show that this type of interval cardio training burns more calories and fat than steady state activities like running on a treadmill or walking on a StairMaster for the same amount of time. \n\n"; break; 
+default:    t = "";  }  return t;}</script></head>
+<body>
+
+    <div id="popDesc" style="position:absolute; visibility:hidden; z-index:100;" class="classDescription">
+        
+        <table cellspacing="0" cellpadding="0" border="0">
+            <tr class="CDTitle">
+              <td><div id="classname" align="left"></div>
+              </td>
+              <td align="right"><span>[<a href="javascript:hideDiv('popDesc');">Close</a>]</span></td>
+            </tr>
+            <tr>
+
+              <td  colspan="2">
+                <p class="CDText"><span id="classdesc"></span></p>
+              </td>
+            </tr>
+        </table>
+    </div>
+   
+    <div> <br />
+        <table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+ 
+                    <div style="text-align:center; height:20px;">
+
+                         
+                                    View:
+                                    <span class="buttonView"><a id="lnkViewTime" href="gxschedule.aspx?type=time&amp;club=00572&amp;date=02/18/2014&amp;sch=Group+X" style="font-weight:bold;">View by Time</a></span>
+                                    <span class="buttonView"><a id="lnkViewClass" href="gxschedule.aspx?type=class&amp;club=00572&amp;date=02/18/2014&amp;sch=Group+X">View by Class</a></span>
+                          
+
+                         
+                             Schedule:
+                             <span class='buttonView' style='font-weight:bold;'><a href='gxschedule.aspx?type=time&club=00572&date=02/18/2014'>Group X</a></span>
+ 
+                    </div>
+                    
+
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                   
+                   
+                    <div style="text-align:center">
+		                <img src="../Images/24HOUR-GROUP-X.png" id="Img1" alt="24 Hour Fitness Logo" />
+	                    <br />
+	                    Lowry Sport:&nbsp;7600 E. Academy Blvd.&nbsp;&nbsp;Denver,&nbsp;CO&nbsp;80230&nbsp;&nbsp;303-343-1049&nbsp;&nbsp;[<a href="javascript:print();">Print</a>]
+	                </div>
+	                
+	                <!---    TITLE & NAVIGATION BAR   -->		
+	                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+	                  <tr>
+	                    <td width="20%"><a id="lnkPrevWeek" href="gxschedule.aspx?date=02/11/2014&amp;club=00572&amp;type=time"><< Previous Week</a></td>
+	                    <td width="60%" align="center" class="calendarTitle">Week of <span id="WeekTitle">February 17, 2014</span></td>
+	                    <td width="20%" align="right"><a id="lnkNextWeek" href="gxschedule.aspx?date=02/25/2014&amp;club=00572&amp;type=time">Next Week >></a></td>
+	                  </tr>
+	                </table>
+	                
+	                <!--  CALENDAR  -->
+
+		            
+
+<!-- ScheduleSource TimeLine Control, Copyright 2005-2014 -->
+<!-- [Feb-17-2014, Feb-23-2014 --><table cellspacing=0 cellpadding=0  id="cal"  width="100%" ><tr><td><table rules="all" frame="box" cellspacing="0" border="1" style="border-collapse:collapse;empty-cells:show;"  bordercolor="#666666"  bgcolor="#ffffff" width="100%"><tr><td  align="center"  class="days" >&nbsp;</td><td  width="14%"  align="center"  class="days" >MON Feb-17</td><td  width="14%"  align="center"  class="days" >TUE Feb-18</td><td  width="14%"  align="center"  class="days" >WED Feb-19</td><td  width="14%"  align="center"  class="days" >THU Feb-20</td><td  width="14%"  align="center"  class="days" >FRI Feb-21</td><td  width="14%"  align="center"  class="days" >SAT Feb-22</td><td  width="14%"  align="center"  class="days" >SUN Feb-23</td></tr>
+<tr><td  height="16"  class="hours" >5:30am</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Chris<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Al<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Lisa<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Andrea R<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,445);" class='cLink'>Step & Strength</a><br />Jason<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td></tr>
+<tr><td  height="16"  class="hours" >8:00am</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,519);" class='cLink'><img src='../Images/24Hour/bodycombatlogo.jpg' height='28' width=92' border='0' /></a><br />Jason<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Lisa<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(7,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Katie H<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(7,366);" class='cLink'>Step</a><br />Jason<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(1,539);" class='cLink'><img src='../Images/24Hour/RPM.jpg' height='28' width=92' border='0' /></a><br />Cycle Room<br />SylviaB<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(1,600);" class='cLink'><img src='../Images/24Hour/zumbastep logo.jpg' height='28' width=92' border='0' /></a><br /><b> Step</b><br />Rachel<br /></span></td></tr>
+<tr><td  height="16"  class="hours" >9:00am</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Devra<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,235);" class='cLink'>Cycle</a><br />Cycle Room<br />kate<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,250);" class='cLink'>Yoga</a><br />Courtney<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,235);" class='cLink'>Cycle</a><br />Cycle Room<br />kate<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,332);" class='cLink'><img src='../Images/24Hour/zumba.jpg' height='28' width=92' border='0' /></a><br />Christina<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,250);" class='cLink'>Yoga</a><br />Alexander<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,519);" class='cLink'><img src='../Images/24Hour/bodycombatlogo.jpg' height='28' width=92' border='0' /></a><br />Jason<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Stephen<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(7,399);" class='cLink'>Aqua</a><br />Pool<br />Dana<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(7,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Jason<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(7,225);" class='cLink'>Boot Camp</a><br />Basketball Court<br />Gregorio Heredia<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(1,250);" class='cLink'>Yoga</a><br />Alexander<br /></span></td></tr>
+<tr><td  height="16"  class="hours" >10:00am</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,232);" class='cLink'><img src='../Images/24Hour/TURBO2010.jpg' height='28' width=92' border='0' /></a><br />Lindsey<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />30 Mins <br />Lisa<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,243);" class='cLink'>Pilates</a><br />Brooke S<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,366);" class='cLink'>Step</a><br />Candice<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />30 Mins <br />Jason<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(7,243);" class='cLink'>Pilates</a><br />Brooke S<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(1,232);" class='cLink'><img src='../Images/24Hour/TURBO2010.jpg' height='28' width=92' border='0' /></a><br />Harmony<br /></span></td></tr>
+<tr><td  height="16"  class="hours" >10:30am</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,549);" class='cLink'><img src='../Images/24Hour/LM-CXWORX.jpg' height='28' width=92' border='0' /></a><br />30 Mins <br />Lisa<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,549);" class='cLink'><img src='../Images/24Hour/LM-CXWORX.jpg' height='28' width=92' border='0' /></a><br />30 Mins <br />Jason<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td></tr>
+<tr><td  height="16"  class="hours" >11:00am</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,367);" class='cLink'>Senior Fitness</a><br />Jason<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,260);" class='cLink'>SilverSneakers® Circuit</a><br />Micki<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,261);" class='cLink'>SilverSneakers® Classic</a><br />Micki<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,260);" class='cLink'>SilverSneakers® Circuit</a><br />Micki<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,367);" class='cLink'>Senior Fitness</a><br />Jason<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(7,332);" class='cLink'><img src='../Images/24Hour/zumba.jpg' height='28' width=92' border='0' /></a><br />Maritza<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(1,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Jamie<br /></span></td></tr>
+<tr><td  height="16"  class="hours" >12:00pm</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Jason<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,539);" class='cLink'><img src='../Images/24Hour/RPM.jpg' height='28' width=92' border='0' /></a><br />Cycle Room<br />Stephen<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Lisa<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Devra<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,250);" class='cLink'>Yoga</a><br />LisaH<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td></tr>
+<tr><td  height="16"  class="hours" >1:00pm</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,409);" class='cLink'><img src='../Images/24Hour/gold.jpg' height='28' width=92' border='0' /></a><br /><b> Gold</b><br />Areli<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,409);" class='cLink'><img src='../Images/24Hour/gold.jpg' height='28' width=92' border='0' /></a><br /><b> Gold</b><br />Areli<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td></tr>
+<tr><td  height="16"  class="hours" >4:30pm</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,539);" class='cLink'><img src='../Images/24Hour/RPM.jpg' height='28' width=92' border='0' /></a><br />Cycle Room<br />Stephen<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Stephen<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td></tr>
+<tr><td  height="16"  class="hours" >5:00pm</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Mimi<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Katie H<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,332);" class='cLink'><img src='../Images/24Hour/zumba.jpg' height='28' width=92' border='0' /></a><br />Carolina<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Logan<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,232);" class='cLink'><img src='../Images/24Hour/TURBO2010.jpg' height='28' width=92' border='0' /></a><br />Sunnee<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,250);" class='cLink'>Yoga</a><br />Joe<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(1,250);" class='cLink'>Yoga</a><br />christy<br /></span></td></tr>
+<tr><td  height="16"  class="hours" >6:00pm</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,519);" class='cLink'><img src='../Images/24Hour/bodycombatlogo.jpg' height='28' width=92' border='0' /></a><br />Alison<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Stephen<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,445);" class='cLink'>Step & Strength</a><br />Nathan<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Al<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,250);" class='cLink'>Yoga</a><br />Joe<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,435);" class='cLink'><img src='../Images/24Hour/BODYPUMP.jpg' height='28' width=92' border='0' /></a><br />Rachel<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,531);" class='cLink'>HIIT (High Intensity Interval Training)</a><br />Basketball Court<br />Gregorio Heredia<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(6,332);" class='cLink'><img src='../Images/24Hour/zumba.jpg' height='28' width=92' border='0' /></a><br />Jessica C<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td></tr>
+<tr><td  height="16"  class="hours" >7:00pm</td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,531);" class='cLink'>HIIT (High Intensity Interval Training)</a><br />Basketball Court<br />Gregorio Heredia<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(2,600);" class='cLink'><img src='../Images/24Hour/zumbastep logo.jpg' height='28' width=92' border='0' /></a><br /><b> Step</b><br />Carolina<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Katie H<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(3,250);" class='cLink'>Yoga</a><br />Joe<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(4,519);" class='cLink'><img src='../Images/24Hour/bodycombatlogo.jpg' height='28' width=92' border='0' /></a><br />Meg<br /></span></td>
+			<td valign="top" >
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,235);" class='cLink'>Cycle</a><br />Cycle Room<br />Trish<br /></span>
+<span >
+<a href="javascript:void(0);"  OnClick="PopClass(5,243);" class='cLink'>Pilates</a><br />Kelly<br /></span></td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td>
+			<td valign="top" >&nbsp;</td></tr>
+</table>
+
+</td></tr></table> 
+			        
+			        <!--  STATION CALENDAR  -->      
+			         
+
+	                <!-- DISCLAIMER  -->
+	                <span class="disclaimer"> 
+		                All classes, times, and instructors subject to
+                        change and/or cancellation. Guest pass members may attend classes between
+                        the hours of 8 AM and 9 PM only. This class schedule can be found at <b>www.24hourfitness.com</b>.
+	                </span>
+	                <br />
+                    <span class="silverFit"> 
+                	    Every Aqua Zumba and Zumba Gold class is Endorsed by Silver&Fit&#174;
+                    </span>
+                    <br />
+	                
+	                 Notes:  
+	                  
+
+                    &nbsp; {<span style='color:Blue; font-weight:bold'>esp</span>} - Se habla espanol
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        var pageTracker = _gat._getTracker("UA-1922540-3");
+        pageTracker._initData();
+        pageTracker._trackPageview();
+    </script>
+
+    <br /><br />
+</body>
+</html>

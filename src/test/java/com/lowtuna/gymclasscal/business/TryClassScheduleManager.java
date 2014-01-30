@@ -1,14 +1,19 @@
 package com.lowtuna.gymclasscal.business;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.base.Optional;
 import com.lowtuna.gymclasscal.config.GymClassCalConfig;
 import com.lowtuna.gymclasscal.core.ClassInfo;
+import com.lowtuna.gymclasscal.util.JsoupDocumentLoader;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Answers;
@@ -17,6 +22,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.when;
 
 @Slf4j
 public class TryClassScheduleManager {
@@ -30,6 +38,9 @@ public class TryClassScheduleManager {
 
     @Mock(answer = Answers.RETURNS_SMART_NULLS)
     private Timer.Context timerContext;
+
+    @Mock(answer = Answers.RETURNS_SMART_NULLS)
+    private JsoupDocumentLoader documentLoader;
 
     @Before
     public void initMockAnnotations() {
@@ -53,10 +64,22 @@ public class TryClassScheduleManager {
         });
     }
 
+    @Before
+    public void initDocumentLoader() {
+        when(documentLoader.loadDocument(anyString())).then(new Answer<Optional<Document>>() {
+            @Override
+            public Optional<Document> answer(InvocationOnMock invocation) throws Throwable {
+                InputStream is = getClass().getClassLoader().getResourceAsStream("572_2014-01-27.html");
+                Document document = Jsoup.parse(is, "utf-8", "http://24hourfit.schedulesource.com/public/");
+                return Optional.fromNullable(document);
+            }
+        });
+    }
+
     @Test
     public void testGetMultipleWeeks() {
         ExecutorService executorService = Executors.newCachedThreadPool();
-        TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null);
+        TwentyFourHourParser parser = new TwentyFourHourParser(config.getClubListBaseUrl(), config.getClubDetailPattern(), config.getClubCalendarTemplate(), metricRegistry, null, documentLoader);
         ClassScheduleManager manager = new ClassScheduleManager(parser, 4, executorService);
         Collection<ClassInfo> allClasses = manager.getClassInfos(572);
         TryClassScheduleManager.log.debug("Found {} classes over 4 weeks", allClasses.size());

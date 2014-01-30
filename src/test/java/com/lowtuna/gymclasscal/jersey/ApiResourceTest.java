@@ -7,11 +7,11 @@ import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
 @Slf4j
-public class ClassInfoResourceTest {
+public class ApiResourceTest {
 
     @Test
     public void test() {
         Collection<String> ids = DateTimeZone.getAvailableIDs();
-        log.info("ids={}", ids);
+        ApiResourceTest.log.info("ids={}", ids);
     }
 }

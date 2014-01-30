@@ -27,6 +27,7 @@ import com.damnhandy.uri.template.UriTemplate;
 import com.damnhandy.uri.template.VariableExpansionException;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.CharMatcher;
+import com.google.common.base.Optional;
 import com.google.common.base.Stopwatch;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -38,6 +39,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.lowtuna.gymclasscal.core.ClassInfo;
 import com.lowtuna.gymclasscal.core.Club;
+import com.lowtuna.gymclasscal.util.JsoupDocumentLoader;
 import io.dropwizard.lifecycle.Managed;
 import io.dropwizard.util.Duration;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +56,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 @Slf4j
-public class TwentyFourHourParser extends HealthCheck implements Managed {
+public class TwentyFourHourParser extends HealthCheck {
     private static final DateTimeFormatter DATE_PARAM_FORMATTER = DateTimeFormat.forPattern("MM/dd/yyyy");
     private static final DateTimeFormatter CALENDAR_DATE_FORMATTER = DateTimeFormat.forPattern("MMM-d");
     private static final Pattern CALENDAR_DATE_PATTERN = Pattern.compile("^\\w+ ([A-Za-z]{3}\\-[\\d]{1,2})$");
@@ -77,78 +79,29 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
 
     private final ScheduledExecutorService scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
     private final ReentrantReadWriteLock clubIdsLock = new ReentrantReadWriteLock();
-    private final LoadingCache<String, Document> clubCalendarDocumentCache = CacheBuilder.newBuilder()
-            .expireAfterWrite(12, TimeUnit.HOURS)
-            .recordStats()
-            .build(new CacheLoader<String, Document>() {
-                @Override
-                public Document load(String key) throws Exception {
-                    Timer.Context timerContext = clubCalendarRequestTimer.time();
-                    try {
-                        Connection.Response response = Jsoup.connect(key).execute();
-                        if (response.statusCode() == 200) {
-                            return response.parse();
-                        }
-                        log.warn("Received non-200 response code ({}) from {}", response.statusCode(), key);
-                        throw new RuntimeException("Received non-200 status code from " + key);
-                    } finally {
-                        timerContext.stop();
-                    }
-                }
-            });
 
     private final String baseClubListUrl;
     private final Pattern clubDetailPagePattern;
     private final UriTemplate clubCalendarUriTemplate;
+    private final JsoupDocumentLoader documentLoader;
+
     private final Timer clubIdsUpdateTimer;
-    private final Timer clubCalendarRequestTimer;
 
     @GuardedBy("clubIdsLock")
     private Set<Integer> clubIds = Sets.newCopyOnWriteArraySet();
 
-    public TwentyFourHourParser(String baseClubListUrl, String clubDetailPagePattern, UriTemplate clubCalendarUriTemplate, MetricRegistry metricRegistry, Duration clubIdsUpdateDuration) {
+    public TwentyFourHourParser(String baseClubListUrl, String clubDetailPagePattern, UriTemplate clubCalendarUriTemplate, MetricRegistry metricRegistry, Duration clubIdsUpdateDuration, JsoupDocumentLoader documentLoader) {
         this.baseClubListUrl = baseClubListUrl;
         this.clubCalendarUriTemplate = clubCalendarUriTemplate;
+        this.documentLoader = documentLoader;
         this.clubDetailPagePattern = Pattern.compile(clubDetailPagePattern);
 
         this.clubIdsUpdateTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "updateClubIds"));
-        this.clubCalendarRequestTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "loadClubCalendar"));
 
         metricRegistry.register(MetricRegistry.name(getClass(), "clubCount"), new Gauge<Integer>() {
             @Override
             public Integer getValue() {
                 return getClubIds().size();
-            }
-        });
-
-        metricRegistry.register(MetricRegistry.name(getClass(), "clubCalendarDocumentCache", "size"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return clubCalendarDocumentCache.size();
-            }
-        });
-        metricRegistry.register(MetricRegistry.name(getClass(), "clubCalendarDocumentCache", "hits"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return clubCalendarDocumentCache.stats().hitCount();
-            }
-        });
-        metricRegistry.register(MetricRegistry.name(getClass(), "clubCalendarDocumentCache", "misses"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return clubCalendarDocumentCache.stats().missCount();
-            }
-        });
-        metricRegistry.register(MetricRegistry.name(getClass(), "clubCalendarDocumentCache", "evictions"), new Gauge<Long>() {
-            @Override
-            public Long getValue() {
-                return clubCalendarDocumentCache.stats().evictionCount();
-            }
-        });
-        metricRegistry.register(MetricRegistry.name(getClass(), "clubCalendarDocumentCache", "loadPenalty"), new Gauge<Double>() {
-            @Override
-            public Double getValue() {
-                return clubCalendarDocumentCache.stats().averageLoadPenalty();
             }
         });
 
@@ -183,10 +136,10 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                     .set("club", clubId)
                     .set("date", DATE_PARAM_FORMATTER.print(weekStart))
                     .expand();
-            Document clubCalDoc = clubCalendarDocumentCache.get(fullUri);
+            Optional<Document> clubCalDoc = documentLoader.loadDocument(fullUri);
 
-            if (club == null) {
-                Elements clubDetails = clubCalDoc.select("body div:eq(1) > table > tbody > tr:eq(1) > td > div");
+            if (clubCalDoc.isPresent()) {
+                Elements clubDetails = clubCalDoc.get().select("body div:eq(1) > table > tbody > tr:eq(1) > td > div");
                 if (!clubDetails.isEmpty()) {
                     Matcher matcher = CLUB_DETAILS_PATTERN.matcher(clubDetails.iterator().next().ownText());
                     if (matcher.matches()) {
@@ -200,8 +153,6 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
             }
         } catch (VariableExpansionException e) {
             log.error("Couldn't create club calendar schedule for clubId={}", clubId, e);
-        } catch (ExecutionException e) {
-            log.error("Couldn't get club calendar schedule for clubId={}", clubId, e);
         }
         return club;
     }
@@ -214,35 +165,36 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                     .set("club", clubId)
                     .set("date", DATE_PARAM_FORMATTER.print(weekStart))
                     .expand();
-            Document clubCalDoc = clubCalendarDocumentCache.get(fullUri);
+            Optional<Document> clubCalDoc = documentLoader.loadDocument(fullUri);
 
-            Elements weekOfEls = clubCalDoc.select("#WeekTitle");
-            if (!weekOfEls.isEmpty()) {
-                DateTime weekDateTime = CALENDAR_WEEK_FORMATTER.parseDateTime(weekOfEls.iterator().next().html());
+            if (clubCalDoc.isPresent()) {
+                Elements weekOfEls = clubCalDoc.get().select("#WeekTitle");
+                if (!weekOfEls.isEmpty()) {
+                    DateTime weekDateTime = CALENDAR_WEEK_FORMATTER.parseDateTime(weekOfEls.iterator().next().html());
 
-                Map<Integer, LocalDate> columnDate = Maps.newHashMap();
-                Elements columns = clubCalDoc.select("#cal > tbody > tr > td > table > tbody > tr:eq(0) > td");
-                populateColumnDates(weekDateTime, columnDate, columns);
+                    Map<Integer, LocalDate> columnDate = Maps.newHashMap();
+                    Elements columns = clubCalDoc.get().select("#cal > tbody > tr > td > table > tbody > tr:eq(0) > td");
+                    populateColumnDates(weekDateTime, columnDate, columns);
 
-                for (Element row: clubCalDoc.select("#cal > tbody > tr > td > table > tbody > tr:gt(0)")) {
-                    columns = row.select("td");
-                    DateTime time = null;
-                    for(int columnNdx = 0; columnNdx < columns.size(); columnNdx++) {
-                        Element element = columns.get(columnNdx);
-                        if (columnNdx == 0 && element.hasClass("hours")) {
-                            time = CALENDAR_TIME_FORMATTER.parseDateTime(element.text());
-                            continue;
-                        }
+                    for (Element row: clubCalDoc.get().select("#cal > tbody > tr > td > table > tbody > tr:gt(0)")) {
+                        columns = row.select("td");
+                        DateTime time = null;
+                        for(int columnNdx = 0; columnNdx < columns.size(); columnNdx++) {
+                            Element element = columns.get(columnNdx);
+                            if (columnNdx == 0 && element.hasClass("hours")) {
+                                time = CALENDAR_TIME_FORMATTER.parseDateTime(element.text());
+                                continue;
+                            }
 
-                        if (time == null) {
-                            TwentyFourHourParser.log.error("Time for the row was null!");
-                            break;
-                        }
+                            if (time == null) {
+                                TwentyFourHourParser.log.error("Time for the row was null!");
+                                break;
+                            }
 
-                        LocalDate date = columnDate.get(columnNdx);
+                            LocalDate date = columnDate.get(columnNdx);
 
-                        if (date == null) {
-                            continue;
+                            if (date == null) {
+                                continue;
                         }
 
                         LocalDateTime classDateTime = new LocalDateTime(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth(), time.getHourOfDay(), time.getMinuteOfHour());
@@ -252,10 +204,9 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
                     }
                 }
             }
+            }
         } catch (VariableExpansionException e) {
             log.error("Couldn't create club calendar schedule for clubId={} and date={}", clubId, weekStart, e);
-        } catch (ExecutionException e) {
-            log.error("Couldn't access club calendar schedule for clubId={} and date={}", clubId, weekStart, e);
         }
         log.info("Fetched {} class schedules for week starting {} for club with id={}", classes.size(), weekStart, clubId);
         return classes;
@@ -412,13 +363,4 @@ public class TwentyFourHourParser extends HealthCheck implements Managed {
         }
     }
 
-    @Override
-    public void start() throws Exception {
-
-    }
-
-    @Override
-    public void stop() throws Exception {
-
-    }
 }
