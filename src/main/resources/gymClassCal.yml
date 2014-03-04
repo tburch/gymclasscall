@@ -1,14 +1,11 @@
 server:
+  type: simple
+  applicationContextPath: /
+  connector:
+    type: http
   requestLog:
-      appenders:
-      - type: "console"
-        logFormat: "%-5p [%d{ISO8601}] [%thread] [%X{requestId}] %c{5}: %m%n%xEx"
-  applicationConnectors:
-  - type: "simple"
-    port: ${ENV.PORT}
-    applicationContextPath: /
-
-
+    appenders:
+    - type: "console"
 # Logging settings.
 logging:
   level: INFO
