@@ -5,6 +5,7 @@ import com.damnhandy.uri.template.UriTemplate;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.jaxrs.json.annotation.JSONP;
 import com.lowtuna.dropwizard.extras.config.ElasticSearchConfig;
+import com.lowtuna.dropwizard.extras.heroku.AntiIdlerConfig;
 import io.dropwizard.Configuration;
 import io.dropwizard.util.Duration;
 import lombok.Getter;
@@ -39,6 +40,10 @@ public class GymClassCalConfig extends Configuration {
     @JsonProperty
     @NotNull
     private ElasticSearchConfig elasticSearch = new ElasticSearchConfig();
+
+    @JsonProperty
+    @NotNull
+    private AntiIdlerConfig antiIdler = new AntiIdlerConfig();
 
     public UriTemplate getClubCalendarTemplate() {
         try {

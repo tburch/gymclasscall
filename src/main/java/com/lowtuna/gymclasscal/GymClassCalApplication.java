@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 
+import com.lowtuna.dropwizard.extras.heroku.AntiIdlerBundle;
+import com.lowtuna.dropwizard.extras.heroku.AntiIdlerConfig;
 import com.lowtuna.gymclasscal.business.ClassScheduleManager;
 import com.lowtuna.gymclasscal.business.TwentyFourHourParser;
 import com.lowtuna.gymclasscal.config.GymClassCalConfig;
@@ -44,6 +46,12 @@ public class GymClassCalApplication extends Application<GymClassCalConfig> {
     @Override
     public void initialize(Bootstrap<GymClassCalConfig> bootstrap) {
         bootstrap.addBundle(new ViewBundle());
+        bootstrap.addBundle(new AntiIdlerBundle<GymClassCalConfig>() {
+            @Override
+            public AntiIdlerConfig getConfig(GymClassCalConfig configuration) {
+                return configuration.getAntiIdler();
+            }
+        });
     }
 
     @Override
