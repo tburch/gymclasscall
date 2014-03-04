@@ -1,1 +1,1 @@
-web    java $JAVA_OPTS -jar server target/config/gymClassCal.yml
+web     java $JAVA_OPTS -Ddw.mongo.type=uri -Ddw.mongo.uri=$MONGOHQ_URL -Ddw.server.connector.type=http -Ddw.server.connector.port=$PORT -jar target/GymClassCal.jar server target/config/gymClassCal.yml
